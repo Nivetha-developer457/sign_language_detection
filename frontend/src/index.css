@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@600&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #F7F9FA;
+  --surface: #FFFFFF;
+  --primary: #1D4E4E;
+  --primary-dim: #143838;
+  --accent: #E8A33D;
+  --text: #16262B;
+  --muted: #5B6B70;
+  --border: #E1E7E7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+h1, h2, h3 {
+  font-family: 'Fraunces', serif;
+  color: var(--primary);
+}
+
+.page {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.topbar {
+  background: var(--primary);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.4rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+button:hover {
+  background: var(--primary-dim);
+}
+button:disabled {
+  background: var(--muted);
+  cursor: not-allowed;
+}
+
+input, select {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+video {
+  border-radius: 10px;
+  display: block;
+}
+
+.gloss-chip {
+  display: inline-block;
+  background: var(--primary);
+  color: white;
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  margin-right: 0.4rem;
+}
+
+.sentence-box {
+  background: #EFF6F5;
+  border-left: 4px solid var(--primary);
+  padding: 0.9rem 1.1rem;
+  border-radius: 8px;
+  margin-top: 0.8rem;
+}
+
+.error-text {
+  color: #B3261E;
+}

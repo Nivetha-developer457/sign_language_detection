@@ -48,6 +48,7 @@ build/
 
 # Datasets and recordings
 backend/Sign video/dataset/
+backend/Sign video/dataset.zip
 backend/Sign video/dataset_new/
 backend/Sign video/new_recordings/
 backend/Sign video/unseen_test/
