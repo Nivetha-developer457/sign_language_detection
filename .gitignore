@@ -1,0 +1,69 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Python virtual environments
+.venv/
+venv/
+env/
+**/extract_env/
+**/predict_env/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Frontend build output
+dist/
+build/
+
+# Machine learning artifacts
+*.h5
+*.hdf5
+*.npy
+
+# Keep the primary model and label map used by the API
+!ai-service/sign_lstm_model.h5
+!ai-service/label_map.json
+!backend/Sign video/sign_lstm_model.h5
+!backend/Sign video/label_map.json
+
+# Datasets and recordings
+backend/Sign video/dataset/
+backend/Sign video/dataset_new/
+backend/Sign video/new_recordings/
+backend/Sign video/unseen_test/
+backend/Sign video/unseen_test_sequences/
+
+# Large video/media assets
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.webm
+*.flv
+*.wmv
+*.m4v
+*.3gp
+backend/videos/
+
+# Logs
+*.log
