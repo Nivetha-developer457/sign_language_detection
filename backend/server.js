@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 5000;
 
 async function ensureTestUsers() {
   const testUsers = [
-    { username: "testrpatient", password: "patient123", role: "patient" },
+    { username: "testpatient", password: "patient123", role: "patient" },
     { username: "testdoctor", password: "doctor123", role: "doctor" },
   ];
 
