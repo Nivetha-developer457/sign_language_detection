@@ -65,6 +65,8 @@ backend/Sign video/unseen_test_sequences/
 *.m4v
 *.3gp
 backend/videos/
+!backend/videos/
+!backend/videos/*.mp4
 
 # Logs
 *.log
