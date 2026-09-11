@@ -1,8 +1,8 @@
 fastapi
 uvicorn
 python-multipart
-numpy
+numpy<2
 opencv-python-headless
-mediapipe
-tensorflow
+mediapipe==0.10.21
+tensorflow==2.16.2
 requests
