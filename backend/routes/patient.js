@@ -6,13 +6,14 @@ const Conversation = require("../models/Conversation");
 
 const router = express.Router();
 const upload = multer();
+const aiServiceUrl = process.env.AI_SERVICE_URL || "http://localhost:8000";
 
 router.post("/predict-frame", upload.single("file"), async (req, res) => {
   try {
     const formData = new FormData();
     formData.append("file", req.file.buffer, "frame.jpg");
 
-    const aiResponse = await axios.post("http://localhost:8000/predict-frame", formData, {
+    const aiResponse = await axios.post(`${aiServiceUrl}/predict-frame`, formData, {
       headers: formData.getHeaders(),
     });
 
@@ -24,7 +25,7 @@ router.post("/predict-frame", upload.single("file"), async (req, res) => {
 
 router.post("/generate-sentence", async (req, res) => {
   try {
-    const aiResponse = await axios.post("http://localhost:8000/generate-sentence");
+    const aiResponse = await axios.post(`${aiServiceUrl}/generate-sentence`);
 
     await Conversation.findOneAndUpdate(
       {},
@@ -44,7 +45,7 @@ router.post("/generate-sentence", async (req, res) => {
 
 router.post("/reset-session-ai", async (req, res) => {
   try {
-    await axios.post("http://localhost:8000/reset-session");
+    await axios.post(`${aiServiceUrl}/reset-session`);
     res.json({ message: "AI session reset." });
   } catch (err) {
     res.status(500).json({ message: "AI service error", error: err.message });

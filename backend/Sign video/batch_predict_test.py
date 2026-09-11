@@ -1,7 +1,7 @@
 import os
 import json
 import numpy as np
-from tensorflow.keras.models import load_model
+from tensorflow.keras.models import load_model  # type: ignore[reportMissingModuleSource]
 
 MODEL_PATH = "sign_lstm_model.h5"
 LABEL_MAP_PATH = "label_map.json"

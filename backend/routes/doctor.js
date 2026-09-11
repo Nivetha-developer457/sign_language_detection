@@ -5,6 +5,7 @@ const matchQuestion = require("../utils/matchQuestion");
 const Conversation = require("../models/Conversation");
 
 const router = express.Router();
+const backendPublicUrl = process.env.BACKEND_PUBLIC_URL || "http://localhost:5000";
 
 router.post("/ask", async (req, res) => {
   const { spokenText } = req.body;
@@ -14,7 +15,7 @@ router.post("/ask", async (req, res) => {
   if (result) {
     const videoPath = path.join(__dirname, "..", "videos", result.question.video);
     const version = fs.existsSync(videoPath) ? fs.statSync(videoPath).mtimeMs : Date.now();
-    videoUrl = `http://localhost:5000/videos/${encodeURIComponent(result.question.video)}?v=${version}`;
+    videoUrl = `${backendPublicUrl}/videos/${encodeURIComponent(result.question.video)}?v=${version}`;
   }
 
   await Conversation.findOneAndUpdate(

@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { startContinuousListening } from "../utils/speechRecognition";
+import { API_URL } from "../utils/api";
 
 function DoctorDashboard({ username }) {
   const [isListening, setIsListening] = useState(false);
   const [heardText, setHeardText] = useState("");
-  const [interimText, setInterimText] = useState("");
   const [error, setError] = useState("");
   const [patientInfo, setPatientInfo] = useState(null);
   const listenerRef = useRef(null);
@@ -13,7 +13,7 @@ function DoctorDashboard({ username }) {
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/doctor/conversation");
+        const res = await axios.get(`${API_URL}/api/doctor/conversation`);
         setPatientInfo(res.data);
       } catch {
         // silently retry next interval
@@ -22,7 +22,7 @@ function DoctorDashboard({ username }) {
     return () => clearInterval(interval);
   }, []);
 
-  const handleToggleListening = async () => {
+  const handleToggleListening = () => {
     if (isListening) {
       listenerRef.current?.stop();
       setIsListening(false);
@@ -30,15 +30,13 @@ function DoctorDashboard({ username }) {
     }
 
     setError("");
-    setInterimText("");
     setIsListening(true);
 
-    listenerRef.current = await startContinuousListening(
+    listenerRef.current = startContinuousListening(
       async (text) => {
         setHeardText(text);
-        setInterimText("");
         try {
-          await axios.post("http://localhost:5000/api/doctor/ask", { spokenText: text });
+          await axios.post(`${API_URL}/api/doctor/ask`, { spokenText: text });
         } catch {
           setError("Server error.");
         }
@@ -46,8 +44,7 @@ function DoctorDashboard({ username }) {
       (errMsg) => {
         setError(errMsg);
         setIsListening(false);
-      },
-      (text) => setInterimText(text)
+      }
     );
   };
 
@@ -64,6 +61,11 @@ function DoctorDashboard({ username }) {
           <p style={{ margin: 0, fontSize: "0.85rem" }}>Welcome, {username}</p>
         </div>
         <button onClick={handleLogout}>Log out</button>
+      </div>
+
+      <div className="card">
+        <h3>Patient</h3>
+        <p>{patientInfo?.patientUsername || "No patient connected yet"}</p>
       </div>
 
       <div className="card">

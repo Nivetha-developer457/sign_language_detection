@@ -1,7 +1,7 @@
 import os
+from importlib import import_module
 
 import numpy as np
-import mediapipe as mp
 
 from extract_dataset import process_video
 
@@ -11,8 +11,19 @@ INPUT_DIR = os.path.join(ROOT_DIR, "new_recordings")
 OUTPUT_DIR = os.path.join(ROOT_DIR, "dataset")
 
 
+def load_mediapipe():
+    try:
+        return import_module("mediapipe")
+    except ModuleNotFoundError as error:
+        raise RuntimeError(
+            "MediaPipe is not installed in the active Python environment. "
+            "Install it with: python -m pip install mediapipe"
+        ) from error
+
+
 def main():
     processed = 0
+    mp = load_mediapipe()
     with mp.solutions.holistic.Holistic(
         min_detection_confidence=0.5,
         min_tracking_confidence=0.5,

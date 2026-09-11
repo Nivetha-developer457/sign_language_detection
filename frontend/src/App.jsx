@@ -18,10 +18,7 @@ function App() {
 
   return (
     <Routes>
-      <Route
-        path="/login"
-        element={<Login onLoginSuccess={handleLoginSuccess} />}
-      />
+      <Route path="/login" element={<Login onLoginSuccess={handleLoginSuccess} />} />
       <Route
         path="/register"
         element={<Register onRegisterSuccess={() => (window.location.href = "/login")} />}

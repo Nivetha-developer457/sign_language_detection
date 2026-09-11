@@ -1,7 +1,7 @@
 import os
+import importlib
 
 import numpy as np
-import mediapipe as mp
 
 from extract_dataset import process_video, SEQUENCE_LENGTH
 
@@ -12,6 +12,13 @@ OUTPUT_DIR = os.path.join(ROOT_DIR, "unseen_test_sequences")
 
 
 def main():
+    try:
+        mp = importlib.import_module("mediapipe")
+    except ImportError as exc:
+        raise RuntimeError(
+            "MediaPipe is required. Install it with 'pip install mediapipe'."
+        ) from exc
+
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     mp_holistic = mp.solutions.holistic
     processed = 0

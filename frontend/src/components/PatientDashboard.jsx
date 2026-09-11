@@ -1,42 +1,77 @@
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
+import { API_URL } from "../utils/api";
 
 function PatientDashboard({ username }) {
   const videoRef = useRef(null);
   const predictionInFlightRef = useRef(false);
-  const [cameraOn, setCameraOn] = useState(true);
+  const [cameraOn, setCameraOn] = useState(false);
+  const [cameraError, setCameraError] = useState("");
   const [detectedSigns, setDetectedSigns] = useState([]);
   const [lastSentence, setLastSentence] = useState("");
   const [doctorVideoUrl, setDoctorVideoUrl] = useState(null);
   const [doctorQuestionText, setDoctorQuestionText] = useState("");
   const [isSending, setIsSending] = useState(false);
 
-  // Reset any leftover conversation data from a previous session
   useEffect(() => {
-    axios.post("http://localhost:5000/api/patient/reset-conversation").catch(() => {});
-    axios.post("http://localhost:5000/api/patient/reset-session-ai").catch(() => {});
+    const startCamera = async () => {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setCameraOn(false);
+        setCameraError("This browser does not support webcam access.");
+        return;
+      }
+
+      try {
+        setCameraError("");
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: "user",
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+          audio: false,
+        });
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.play().catch(() => {});
+        }
+        setCameraOn(true);
+      } catch (err) {
+        setCameraOn(false);
+        setCameraError(
+          "Camera access was blocked. Please allow camera access for localhost and refresh the page."
+        );
+        console.error("Camera permission error:", err);
+      }
+    };
+
+    startCamera();
+  }, []);
+
+  // Reset any leftover conversation/AI session data from a previous run
+  useEffect(() => {
+    axios.post(`${API_URL}/api/patient/reset-conversation`).catch(() => {});
+    axios.post(`${API_URL}/api/patient/reset-session-ai`).catch(() => {});
   }, []);
 
   // Camera on/off
   useEffect(() => {
-    if (cameraOn) {
-      navigator.mediaDevices
-        .getUserMedia({ video: true })
-        .then((stream) => {
-          if (videoRef.current) videoRef.current.srcObject = stream;
-        })
-        .catch(() => setCameraOn(false));
-    } else if (videoRef.current?.srcObject) {
-      videoRef.current.srcObject.getTracks().forEach((t) => t.stop());
-      videoRef.current.srcObject = null;
-    }
-  }, [cameraOn]);
+    const video = videoRef.current;
+
+    return () => {
+      if (video?.srcObject) {
+        video.srcObject.getTracks().forEach((track) => track.stop());
+        video.srcObject = null;
+      }
+    };
+  }, []);
 
   // Poll for the doctor's latest question
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/patient/conversation");
+        const res = await axios.get(`${API_URL}/api/patient/conversation`);
         if (res.data.doctorVideoUrl && res.data.doctorVideoUrl !== doctorVideoUrl) {
           setDoctorVideoUrl(res.data.doctorVideoUrl);
           setDoctorQuestionText(res.data.doctorQuestion || "");
@@ -54,40 +89,48 @@ function PatientDashboard({ username }) {
 
     const canvas = document.createElement("canvas");
     const interval = setInterval(async () => {
-      if (document.hidden) return;
       if (predictionInFlightRef.current) return;
 
       const video = videoRef.current;
       if (!video || video.videoWidth === 0) return;
-      predictionInFlightRef.current = true;
 
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-      canvas.getContext("2d").drawImage(video, 0, 0);
+      const context = canvas.getContext("2d");
+      context.save();
+      context.translate(canvas.width, 0);
+      context.scale(-1, 1);
+      context.drawImage(video, 0, 0);
+      context.restore();
 
-      canvas.toBlob(async (blob) => {
-        if (!blob) {
-          predictionInFlightRef.current = false;
-          return;
-        }
-        const formData = new FormData();
-        formData.append("file", blob, "frame.jpg");
-
-        try {
-          const response = await axios.post(
-            "http://localhost:5000/api/patient/predict-frame",
-            formData
-          );
-          if (response.data.glosses) {
-            setDetectedSigns(response.data.glosses);
+      predictionInFlightRef.current = true;
+      canvas.toBlob(
+        async (blob) => {
+          if (!blob) {
+            predictionInFlightRef.current = false;
+            return;
           }
-        } catch (err) {
-          console.error("Frame prediction error:", err);
-        } finally {
-          predictionInFlightRef.current = false;
-        }
-      }, "image/jpeg", 0.95);
-    }, 80); // sends ~5 frames per second
+          const formData = new FormData();
+          formData.append("file", blob, "frame.jpg");
+
+          try {
+            const response = await axios.post(
+              `${API_URL}/api/patient/predict-frame`,
+              formData
+            );
+            if (response.data.glosses) {
+              setDetectedSigns(response.data.glosses);
+            }
+          } catch (err) {
+            console.error("Frame prediction error:", err);
+          } finally {
+            predictionInFlightRef.current = false;
+          }
+        },
+        "image/jpeg",
+        0.95
+      );
+    }, 100); // Keep one prediction request active at a time.
 
     return () => clearInterval(interval);
   }, [cameraOn]);
@@ -95,9 +138,9 @@ function PatientDashboard({ username }) {
   const handleSendToDoctor = async () => {
     setIsSending(true);
     try {
-      const response = await axios.post("http://localhost:5000/api/patient/generate-sentence");
+      const response = await axios.post(`${API_URL}/api/patient/generate-sentence`);
       setLastSentence(response.data.sentence);
-      await axios.post("http://localhost:5000/api/patient/reset-session-ai");
+      await axios.post(`${API_URL}/api/patient/reset-session-ai`);
       setDetectedSigns([]);
     } catch (err) {
       console.error("Sentence generation error:", err);
@@ -180,8 +223,33 @@ function PatientDashboard({ username }) {
             autoPlay
             playsInline
             muted
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              transform: "scaleX(-1)",
+            }}
           />
+          {!cameraOn && (
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: "rgba(0,0,0,0.7)",
+                color: "white",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+                fontSize: "0.7rem",
+                padding: "0.5rem",
+                gap: "0.6rem",
+              }}
+            >
+              <span>Camera blocked</span>
+            </div>
+          )}
           <span
             title={cameraOn ? "Camera is on" : "Camera is off"}
             style={{
@@ -197,6 +265,12 @@ function PatientDashboard({ username }) {
           />
         </div>
       </div>
+
+      {cameraError && (
+        <div style={{ margin: "0 1rem 1rem", color: "#ffb4b4", fontSize: "0.9rem" }}>
+          {cameraError}
+        </div>
+      )}
 
       <div className="card" style={{ margin: "1rem", marginTop: 0 }}>
         <div style={{ marginBottom: "0.8rem" }}>

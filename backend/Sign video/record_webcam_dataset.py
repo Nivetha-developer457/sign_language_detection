@@ -5,13 +5,12 @@ import cv2
 
 
 CLASSES = [
-    "Fever",
-    "Eat",
-    "Headache",
+    "Cold",
+    "Days",
     "Three",
 ]
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-TRAINING_DIR = os.path.join(ROOT_DIR, "new_recordings")
+TRAINING_DIR = ROOT_DIR
 TEST_DIR = os.path.join(ROOT_DIR, "unseen_test")
 
 
@@ -53,7 +52,8 @@ def record_video(output_path, camera):
                 os.remove(output_path)
             break
 
-        display = frame.copy()
+        mirrored_frame = cv2.flip(frame, 1)
+        display = mirrored_frame.copy()
         message = "RECORDING - SPACE stops" if recording else "SPACE starts - Q cancels"
         cv2.putText(display, message, (20, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
         cv2.imshow("Sign recording", display)

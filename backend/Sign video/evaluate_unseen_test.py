@@ -3,7 +3,7 @@ import os
 
 import numpy as np
 from sklearn.metrics import classification_report, confusion_matrix
-from tensorflow.keras.models import load_model
+from tensorflow.keras.models import load_model  # type: ignore[reportMissingModuleSource]
 
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
