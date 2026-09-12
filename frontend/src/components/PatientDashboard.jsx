@@ -182,6 +182,8 @@ function PatientDashboard({ username }) {
             src={doctorVideoUrl}
             controls
             autoPlay
+            muted
+            playsInline
             style={{ width: "100%", height: "100%", objectFit: "contain" }}
           />
         ) : (
