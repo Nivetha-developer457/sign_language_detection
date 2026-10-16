@@ -7,6 +7,26 @@ const Conversation = require("../models/Conversation");
 const router = express.Router();
 const upload = multer();
 
+router.post("/presence", async (req, res) => {
+  const { username, active } = req.body;
+
+  if (!username || typeof active !== "boolean") {
+    return res.status(400).json({ message: "Username and active status are required." });
+  }
+
+  const update = active
+    ? { patientUsername: username, patientLastSeen: new Date() }
+    : { patientLastSeen: null };
+
+  await Conversation.findOneAndUpdate(
+    active ? {} : { patientUsername: username },
+    { ...update, updatedAt: Date.now() },
+    { upsert: active }
+  );
+
+  res.json({ connected: active });
+});
+
 router.post("/predict-frame", upload.single("file"), async (req, res) => {
   try {
     const formData = new FormData();
@@ -24,11 +44,13 @@ router.post("/predict-frame", upload.single("file"), async (req, res) => {
 
 router.post("/generate-sentence", async (req, res) => {
   try {
+    const { username } = req.body;
     const aiResponse = await axios.post("http://localhost:8000/generate-sentence");
 
     await Conversation.findOneAndUpdate(
       {},
       {
+        ...(username ? { patientUsername: username } : {}),
         patientGlosses: aiResponse.data.glosses,
         patientSentence: aiResponse.data.sentence,
         updatedAt: Date.now(),

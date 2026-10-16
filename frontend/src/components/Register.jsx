@@ -28,41 +28,41 @@ function Register({ onRegisterSuccess }) {
   };
 
   return (
-  <div className="page" style={{ maxWidth: "420px" }}>
-    <div className="topbar">
-      <h2 style={{ margin: 0, color: "white" }}>ISL Doctor-Patient Communication</h2>
-    </div>
+    <div className="page" style={{ maxWidth: "420px" }}>
+      <div className="topbar">
+        <h2 style={{ margin: 0, color: "white" }}>ISL Doctor-Patient Communication</h2>
+      </div>
 
-    <div className="card">
-      <h3>Register</h3>
-      <input
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <select value={role} onChange={(e) => setRole(e.target.value)}>
-        <option value="patient">Patient</option>
-        <option value="doctor">Doctor</option>
-      </select>
-      <button onClick={handleRegister}>Register</button>
-      {error && <p className="error-text">{error}</p>}
-      {success && <p style={{ color: "#3F8F5F" }}>{success}</p>}
-      {onRegisterSuccess && (
-        <p>
-          Already have an account?{" "}
-          <button onClick={onRegisterSuccess}>Go to Login</button>
-        </p>
-      )}
+      <div className="card">
+        <h3>Register</h3>
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <select value={role} onChange={(e) => setRole(e.target.value)}>
+          <option value="patient">Patient</option>
+          <option value="doctor">Doctor</option>
+        </select>
+        <button onClick={handleRegister}>Register</button>
+        {error && <p className="error-text">{error}</p>}
+        {success && <p style={{ color: "#3F8F5F" }}>{success}</p>}
+        {onRegisterSuccess && (
+          <p>
+            Already have an account?{" "}
+            <button onClick={onRegisterSuccess}>Go to Login</button>
+          </p>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
 }
 
 export default Register;

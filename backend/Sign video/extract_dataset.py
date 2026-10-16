@@ -1,7 +1,14 @@
 import os
 import cv2
 import numpy as np
-import mediapipe as mp
+import importlib
+
+try:
+    mp = importlib.import_module("mediapipe")
+except ImportError as exc:
+    raise ImportError(
+        "MediaPipe is required. Install it with: pip install mediapipe"
+    ) from exc
 
 mp_holistic = mp.solutions.holistic
 

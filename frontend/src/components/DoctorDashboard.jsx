@@ -5,7 +5,6 @@ import { startContinuousListening } from "../utils/speechRecognition";
 function DoctorDashboard({ username }) {
   const [isListening, setIsListening] = useState(false);
   const [heardText, setHeardText] = useState("");
-  const [interimText, setInterimText] = useState("");
   const [error, setError] = useState("");
   const [patientInfo, setPatientInfo] = useState(null);
   const listenerRef = useRef(null);
@@ -22,7 +21,7 @@ function DoctorDashboard({ username }) {
     return () => clearInterval(interval);
   }, []);
 
-  const handleToggleListening = async () => {
+  const handleToggleListening = () => {
     if (isListening) {
       listenerRef.current?.stop();
       setIsListening(false);
@@ -30,13 +29,11 @@ function DoctorDashboard({ username }) {
     }
 
     setError("");
-    setInterimText("");
     setIsListening(true);
 
-    listenerRef.current = await startContinuousListening(
+    listenerRef.current = startContinuousListening(
       async (text) => {
         setHeardText(text);
-        setInterimText("");
         try {
           await axios.post("http://localhost:5000/api/doctor/ask", { spokenText: text });
         } catch {
@@ -46,8 +43,7 @@ function DoctorDashboard({ username }) {
       (errMsg) => {
         setError(errMsg);
         setIsListening(false);
-      },
-      (text) => setInterimText(text)
+      }
     );
   };
 
@@ -64,6 +60,11 @@ function DoctorDashboard({ username }) {
           <p style={{ margin: 0, fontSize: "0.85rem" }}>Welcome, {username}</p>
         </div>
         <button onClick={handleLogout}>Log out</button>
+      </div>
+
+      <div className="card">
+        <h3>Patient</h3>
+        <p>{patientInfo?.patientUsername || "No patient name yet"}</p>
       </div>
 
       <div className="card">

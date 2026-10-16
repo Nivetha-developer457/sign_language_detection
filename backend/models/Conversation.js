@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const conversationSchema = new mongoose.Schema({
   patientUsername: { type: String, default: null },
+  patientLastSeen: { type: Date, default: null },
   doctorQuestion: { type: String, default: null },
   doctorVideoUrl: { type: String, default: null },
   patientGlosses: { type: [String], default: [] },

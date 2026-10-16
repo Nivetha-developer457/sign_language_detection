@@ -7,10 +7,19 @@ import numpy as np
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.utils.class_weight import compute_class_weight
-from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
-from tensorflow.keras.layers import Bidirectional, Dense, Dropout, Input, LSTM
-from tensorflow.keras.models import Sequential, load_model
-from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.callbacks import (  # type: ignore[reportMissingImports]
+    EarlyStopping,
+    ReduceLROnPlateau,
+)
+from tensorflow.keras.layers import (  # type: ignore[reportMissingImports]
+    Bidirectional,
+    Dense,
+    Dropout,
+    Input,
+    LSTM,
+)
+from tensorflow.keras.models import Sequential, load_model  # type: ignore[reportMissingImports]
+from tensorflow.keras.utils import to_categorical  # type: ignore[reportMissingImports]
 
 SEED = 42
 np.random.seed(SEED)
