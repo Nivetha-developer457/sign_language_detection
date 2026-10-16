@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { startContinuousListening } from "../utils/speechRecognition";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 function DoctorDashboard({ username }) {
   const [isListening, setIsListening] = useState(false);
   const [heardText, setHeardText] = useState("");
@@ -12,7 +14,7 @@ function DoctorDashboard({ username }) {
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/doctor/conversation");
+        const res = await axios.get(`${API_URL}/api/doctor/conversation`);
         setPatientInfo(res.data);
       } catch {
         // silently retry next interval
@@ -35,7 +37,7 @@ function DoctorDashboard({ username }) {
       async (text) => {
         setHeardText(text);
         try {
-          await axios.post("http://localhost:5000/api/doctor/ask", { spokenText: text });
+          await axios.post(`${API_URL}/api/doctor/ask`, { spokenText: text });
         } catch {
           setError("Server error.");
         }

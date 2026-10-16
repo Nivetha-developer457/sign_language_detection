@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 function PatientDashboard({ username }) {
   const videoRef = useRef(null);
   const predictionInFlightRef = useRef(false);
@@ -50,14 +52,14 @@ function PatientDashboard({ username }) {
 
   // Reset any leftover conversation/AI session data from a previous run
   useEffect(() => {
-    axios.post("http://localhost:5000/api/patient/reset-conversation").catch(() => {});
-    axios.post("http://localhost:5000/api/patient/reset-session-ai").catch(() => {});
+    axios.post(`${API_URL}/api/patient/reset-conversation`).catch(() => {});
+    axios.post(`${API_URL}/api/patient/reset-session-ai`).catch(() => {});
   }, []);
 
   useEffect(() => {
     const updatePresence = () => {
       axios
-        .post("http://localhost:5000/api/patient/presence", { username, active: true })
+        .post(`${API_URL}/api/patient/presence`, { username, active: true })
         .catch((err) => console.error("Patient presence update error:", err));
     };
 
@@ -67,7 +69,7 @@ function PatientDashboard({ username }) {
     return () => {
       clearInterval(interval);
       axios
-        .post("http://localhost:5000/api/patient/presence", { username, active: false })
+        .post(`${API_URL}/api/patient/presence`, { username, active: false })
         .catch((err) => console.error("Patient disconnect error:", err));
     };
   }, [username]);
@@ -88,7 +90,7 @@ function PatientDashboard({ username }) {
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/patient/conversation");
+        const res = await axios.get(`${API_URL}/api/patient/conversation`);
         if (res.data.doctorVideoUrl && res.data.doctorVideoUrl !== doctorVideoUrl) {
           setDoctorVideoUrl(res.data.doctorVideoUrl);
           setDoctorQuestionText(res.data.doctorQuestion || "");
@@ -132,7 +134,7 @@ function PatientDashboard({ username }) {
 
           try {
             const response = await axios.post(
-              "http://localhost:5000/api/patient/predict-frame",
+              `${API_URL}/api/patient/predict-frame`,
               formData
             );
             if (response.data.glosses) {
@@ -155,11 +157,11 @@ function PatientDashboard({ username }) {
   const handleSendToDoctor = async () => {
     setIsSending(true);
     try {
-      const response = await axios.post("http://localhost:5000/api/patient/generate-sentence", {
+      const response = await axios.post(`${API_URL}/api/patient/generate-sentence`, {
         username,
       });
       setLastSentence(response.data.sentence);
-      await axios.post("http://localhost:5000/api/patient/reset-session-ai");
+      await axios.post(`${API_URL}/api/patient/reset-session-ai`);
       setDetectedSigns([]);
     } catch (err) {
       console.error("Sentence generation error:", err);
